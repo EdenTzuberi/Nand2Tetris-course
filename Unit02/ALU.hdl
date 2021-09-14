@@ -64,6 +64,15 @@ CHIP ALU {
 
         // if (no == 1) set out = !out   // bitwise not
         Not16(in=outf, out=notoutf);
-        Mux16(a=outf, b=notoutf, sel=no, out=out);
+        Mux16(a=outf, b=notoutf, sel=no, out=out, out[0..7]=p1, out[8..15]=p2, out[15]=firstBit);
+        
+        // if (out == 0) set zr = 1
+        Or8Way(in=p1, out=sump1);
+        Or8Way(in=p2, out=sump2);
+        Or(a=sump1, b=sump2, out=totalsum);
+        Not(in=totalsum, out=zr);
+
+        // if (out < 0) set ng = 1
+        And(a=firstBit, b=true, out=ng);
 
 }
